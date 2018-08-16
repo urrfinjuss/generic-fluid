@@ -13,7 +13,7 @@ int main (int argc, char **argv) {
   Control.DataPtrPrev = &DataPrev;
   Control.EvolvePtr = &EvolveConfig;
   
-  evaluate_jacobi_sn();
+  elliptic_demo();
 
   return 0;
 }
