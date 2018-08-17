@@ -5,7 +5,8 @@ control_params 	Control;
 evolve_params 	EvolveConfig;
 sim_data 	DataCurr, DataPrev;
 sim_data 	DataSpectrum, DataSurface;
-
+cmap		this_map;
+cmap		last_map;
 
 /* main function */
 int main (int argc, char **argv) {
@@ -13,7 +14,12 @@ int main (int argc, char **argv) {
   Control.DataPtrPrev = &DataPrev;
   Control.EvolvePtr = &EvolveConfig;
   
-  elliptic_demo();
+  ffluid_read_cl_arguments(argc, argv);
+  
+  set_HTmap(&this_map);
+  gfluid_write_map("ht.cmg");
+  
+  //elliptic_demo();
 
   return 0;
 }

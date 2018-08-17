@@ -132,7 +132,7 @@ void elliptic_demo() {
   __float128 am, sn, cn, dn;
   __float128 k0;
   
-  kc = 2.5e-2Q;
+  kc = 1.0e-4Q;
   // find the period of elliptic functions:
   elliptic_k(&k0, &kc);
   k0 = k0/PIq; 
@@ -149,16 +149,26 @@ void elliptic_demo() {
   printf("cn(u, k) = %39.32Qe\n", cn);
   printf("dn(u, k) = %39.32Qe\n", dn);
   
-  long int	N = 256;
+  unsigned long	N = 256;
   __float128	w, q;
-  FILE *fh = fopen("ht_transform.txt","w");
-  fprintf(fh, "# 1. q 2. w\n");
+  char 		fname[80];
+  
+  this_map.N  = 256;
+  this_map.kc = 1.0e-4Q;
+
+  set_HTmap(&this_map);
+  gfluid_write_map("ht_map.txt");
+
+  sprintf(fname, "ht_transform.ikc_%2ld.txt", lroundq(1.Q/this_map.kc));
+  FILE *fh = fopen(fname,"w");
+  fprintf(fh, "# 1. u\n");
   fprintf(fh, "# transform type is Hale-Tee N = %ld\tkc = %39.32Qe\n\n", N, kc);
   for (long int j = 0; j < N; j++) {
     q = PIq*k0*(2.Q*j/N - 1.Q);
     jacobi_elliptic(&sn, &cn, &dn, &q, &kc);
     w = 2.Q*asinq(kc*sn/dn);
-    fprintf(fh, "%39.32Qe\t%39.32Qe\n", q/k0, w);
+    //fprintf(fh, "%39.32Qe\t", q/k0);
+    fprintf(fh, "%39.32Qe\n", w);
   }
   fclose(fh);
   

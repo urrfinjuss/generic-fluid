@@ -1,10 +1,7 @@
 #include "gfluid.h"
 
 
-void ffluid_memory_module() {
-  printf("Module ffluid/memory.h:\n");
-  printf("memory.c:\tffluid_memory_module ffluid_init_data\n");
-}
+/* Allocate data arrays  */
 
 void ffluid_init_data(data_ptr in) {
   in->R = fftwq_malloc(in->N*sizeof(long_complex_t));

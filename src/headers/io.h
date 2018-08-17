@@ -1,5 +1,6 @@
 /* declared in io/io.c */
-extern void ffluid_io_module();
+extern void ffluid_write_array(long_complex_t *in, unsigned long N, char *fname);
+extern void gfluid_write_map(char *fname);
 
 /* declared in io/input_data.c */
 extern void ffluid_read_initial_data(data_ptr in);
@@ -17,4 +18,6 @@ extern void ffluid_write_surface(data_ptr in, char *fname);
 extern void ffluid_write_spectrum(data_ptr in, char *fname);
 extern void ffluid_start_log(char *fname);
 extern void ffluid_append_to_log(data_ptr in, char *fname);
-extern void ffluid_write_array(long_complex_t *in, unsigned long N, char *fname);
+
+
+

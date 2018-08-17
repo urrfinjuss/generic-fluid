@@ -1,7 +1,7 @@
 #include "gfluid.h"
 
 /* Set number of parameters to be set in the input file */
-#define INPUT_FILE_ARGS 7	
+#define INPUT_FILE_ARGS 8	
 
 void ffluid_read_cl_arguments(int narg, char **argv) {
   if (narg != 2) {
@@ -66,8 +66,13 @@ void ffluid_scan_input_file(FILE *fh) {
     } else if (!strcmp(keyword,"number_points")) {
       printf("Found:\t%s\n", keyword);
       DataCurr.N = strtol(str_value, NULL, 10);
+      this_map.N = DataCurr.N;
       counter++;
-    } 
+    } else if (!strcmp(keyword,"transform_kc")) {
+      printf("Found:\t%s\n", keyword);
+      this_map.kc = strtoflt128(str_value, NULL);
+      counter++;
+     }
   }
   if (counter == nparameters) {
     printf("Scan Complete: %d lines\n", counter);
