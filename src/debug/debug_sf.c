@@ -132,11 +132,12 @@ void elliptic_demo() {
   __float128 am, sn, cn, dn;
   __float128 k0;
   
-  kc = 1e-2Q;
+  kc = 2.5e-2Q;
   // find the period of elliptic functions:
   elliptic_k(&k0, &kc);
   k0 = k0/PIq; 
-  u = PIq*k0; // this might be too extreme
+  u = PIq*k0;   // this might be too extreme
+  //u = 0.5Q*PIq; // this might be too extreme
   jacobi_am(&am, &u, &kc); 
   jacobi_elliptic(&sn, &cn, &dn, &u, &kc);
   printf("Full Report:\n");

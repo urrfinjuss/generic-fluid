@@ -95,7 +95,8 @@ void elliptic_k(__float128 *out, __float128 *inkc) {
   /* sum the terms starting with the smallest by Horner's method */
   *out = c[24];
   for (int j = 23; j > -1; j-- ) {
-    *out = -(*out)*t + c[j];
+    //*out = -(*out)*t + c[j];
+    *out = fmaq(*out, -t, c[j]);
   }
 }
 
@@ -105,8 +106,8 @@ void jacobi_am(__float128 *out, __float128 *in, __float128 *inkc) {
    * the Jacobi amplitude by expansion of am(u, k) at kc = 0 and 
    * evaluating the series up to kc^14. 
    *
-   * The Jacobi amplitude is accurate up to 16 digits for kc = 1/4
-   * 			     accurate up to 32 digits for kc = 1/8  */
+   * The Jacobi amplitude is accurate up to 18 digits for kc = 1/20
+   * 			     accurate up to 32 digits for kc = 1/40  */
   __float128 c[25];
   __float128 x, t;
   __float128 se1, sh1, ch1, th1;
@@ -114,25 +115,21 @@ void jacobi_am(__float128 *out, __float128 *in, __float128 *inkc) {
   __float128 ch3, sh3;
   __float128 ch4;
   __float128 sh5, ch5;
-  __float128 sh7;
+  __float128 sh7, ch7;
 
   x = *in;
   se1 = 1.Q/coshq(x);
   sh1 = sinhq(x);
   ch1 = coshq(x);
   th1 = tanhq(x);
-
   ch2 = coshq(2.Q*x);
-
   ch3 = coshq(3.Q*x);
   sh3 = sinhq(3.Q*x);
-
   ch4 = coshq(4.Q*x);
-
   sh5 = sinhq(5.Q*x);
   ch5 = coshq(5.Q*x);
-
   sh7 = sinhq(7.Q*x);
+  ch7 = coshq(7.Q*x);
   /* series expansion near k = 1  */
   t = powq(*inkc, 2);
   /* O(1) */
@@ -175,10 +172,29 @@ void jacobi_am(__float128 *out, __float128 *in, __float128 *inkc) {
   c[7] +=-53760.Q*powq(x*se1, 5)*(4.Q*x*x + 30.Q*x*th1 + 141.Q);
   c[7] +=   -45.Q*(-21462693.Q*sh1 + 285838.Q*sh3 - 1484.Q*sh5 + sh7);
   c[7] = -c[7]/21139292160.Q;
+  /* O(xc^16) */
+  c[8] = -322560.Q*powq(x*se1,7)*(x*th1 + 10.Q);
+  c[8] +=    -84.Q*x*x*(-45.Q*sh3*(528.Q*x*x + 16051.Q) + 4.Q*sh1*(104.Q*x*x*x*x + 56095.Q*x*x + 3965880.Q) + 3750.Q*sh5);
+  c[8] +=  13440.Q*powq(x*se1,5)*(280.Q*x*x + 2.Q*x*th1*(10.Q*x*x + 639.Q) + 4797.Q);
+  c[8] +=    -56.Q*powq(x*se1,3)*(520.Q*x*x*(28.Q*x*x + 1845.Q) + 3.Q*x*th1*(208.Q*x*x*x*x + 51120.Q*x*x + 1134675.Q) + 8402805.Q);
+  c[8] +=      1.Q*x*x*se1*(140.Q*x*(32.Q*x*x*x*x + 19188.Q*x*x + 1680561.Q) + th1*(64.Q*powq(x,6) + 143136.Q*powq(x,4)+31770900.Q*x*x + 1003691115.Q));
+  c[8] =     -2.Q*c[8] - 4.Q*x*ch1*(8.Q*x*x*(32.Q*x*x*x*x + 66864.Q*x*x + 12742275.Q)+2377525815.Q);
+  c[8] +=   252.Q*x*ch3*(864.Q*x*x*x*x + 121320.Q*x*x + 982075.Q);
+  c[8] +=    -2.Q*1680.Q*x*ch5*(25.Q*x*x + 489.Q);
+  c[8] +=   315.Q*x*(4.Q*ch7 - 11998869.Q*se1);
+  c[8] +=   315.Q*(43341737.Q*sh1 - 8.Q*(81499*sh3 - 588.Q*sh5 + sh7));
+  c[8] = c[8]/338228674560.Q;
+  /* O(xc^18) -- incomplete
+   * O(xc^20) -- incomplete
+   * O(xc^22) -- incomplete
+   * O(xc^24) -- incomplete
+   * A couple more orders would be much better, there is a
+   * problem with cn(u,kc) at the ends of the interval.           */
   /* sum the terms starting with the smallest by Horner's method */
-  *out = c[7];
-  for (int j = 6; j > -1; j-- ) {
-    *out = -(*out)*t + c[j];
+  *out = c[8];
+  for (int j = 7; j > -1; j-- ) {
+    //*out = -(*out)*t + c[j];
+    *out = fmaq(*out, -t, c[j]);
   }
 }
 
