@@ -4,11 +4,15 @@
 /* Allocate data arrays  */
 
 void ffluid_init_data(data_ptr in) {
-  in->R = fftwq_malloc(in->N*sizeof(long_complex_t));
-  in->V = fftwq_malloc(in->N*sizeof(long_complex_t));
-  in->u = fftwq_malloc(in->N*sizeof(long_complex_t));
-  in->du = fftwq_malloc(in->N*sizeof(long_complex_t));
-  in->q = fftwq_malloc(in->N*sizeof(long_double_t));
+  cmap_ptr new_map;
+  in->Q = fftwq_malloc((in->N)*sizeof(long_complex_t));
+  in->V = fftwq_malloc((in->N)*sizeof(long_complex_t));
+  in->Z = fftwq_malloc((in->N)*sizeof(long_complex_t));
+  in->Phi = fftwq_malloc((in->N)*sizeof(long_complex_t));
+  in->map = fftwq_malloc(sizeof(cmap));
+  new_map = in->map;
+  new_map->u  = fftwq_malloc((in->N)*sizeof(long_complex_t));
+  new_map->dq = fftwq_malloc((in->N)*sizeof(long_complex_t));
 }
 
 void ffluid_alloc_aux_array(aux_data_ptr in, unsigned long NArrays, unsigned long NElements) {

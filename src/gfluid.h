@@ -9,8 +9,13 @@
 #define PIq 	acosq(-1.0Q)
 #define PIl	acosl(-1.0L)
 
-typedef __float128	long_double_t;
-typedef fftwq_complex	long_complex_t;
+typedef __float128		long_double_t;
+typedef fftwq_complex		long_complex_t;
+typedef struct data_array	*data_ptr;
+typedef struct conformal_map	*cmap_ptr;
+
+#include "headers/mapping.h"
+#include "headers/io.h"
 
 typedef struct stepping_parameters {
   unsigned long nsteps, cur_step, dmp_cnt;
@@ -18,18 +23,21 @@ typedef struct stepping_parameters {
   __float128	final_time;
 } evolve_params, *evolve_params_ptr;
 
+
+/*  Note: Move to memory.h or array.h  */
+
 typedef struct data_array {
   unsigned long		N;
-  long_complex_t	*R, *V;
-  long_complex_t	*u, *du;
-  long_complex_t	z0, beta;
-  long_double_t		*q;
-  long_double_t		q0, u0, l;
+  long_complex_t	*Q, *V;
+  long_complex_t	*Z, *Phi;
+  //long_complex_t	z0, beta; // what is it and why?
+  //long_double_t		*q;
+  cmap_ptr		map;
+  //long_complex_t	*u, *du;
+  //long_double_t		q0, u0, l;
   long_double_t		Volume, Hamiltonian, SurfaceEnergy;
   __float128 		time;
 } sim_data, *data_ptr;
-
-#include "headers/io.h"
 
 typedef struct aux_array {
   unsigned long		NElements;
@@ -44,27 +52,40 @@ typedef struct fft_array {
   fftwq_plan		*bp;
 } fft_list, *fft_list_ptr;
 
-/* Note to self: remember top to bottom this time */
 #include "headers/memory.h"
-#include "headers/mapping.h"
+
+/*  END  */
+
+
+
+/* Note to self: remember top to bottom this time */
 #include "headers/special_functions.h"
+#include "headers/math.h"
+
+
 #include "headers/debug.h"
 //#include "headers/array_func.h"
+
+
 #include "headers/messages.h"
+
+/* Control Parameters: move to parameters.h  */
 
 typedef struct control_parameters_array{
   data_ptr		DataPtrCurr, DataPtrPrev;
   evolve_params_ptr 	EvolvePtr;
   long_double_t		Sigma;
+  long_double_t		transform_kc;
   char 			run_name[80];
   char			res_name[80];
   char			data_path[80];
 } control_params, *control_params_ptr;
 
-/* Global Variable */ 
+/* Global Variable: here is fine */ 
 extern sim_data		DataCurr, DataPrev;
 extern sim_data         DataSpectrum, DataSurface;
 extern control_params	Control;
 extern evolve_params	EvolveConfig;
-
+extern cmap this_map;
+extern cmap last_map;
 

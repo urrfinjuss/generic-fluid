@@ -126,7 +126,7 @@ void evaluate_jacobi_sn() {
   printf("GSL sn:\tsn(u,k) = %23.17e\n", sn_gsl);
   printf("Exact:\tsn(u,k) = %s\n", sn_true2);
 }
-
+/*
 void elliptic_demo() {
   __float128 u, kc;
   __float128 am, sn, cn, dn;
@@ -171,12 +171,24 @@ void elliptic_demo() {
     fprintf(fh, "%39.32Qe\n", w);
   }
   fclose(fh);
-  
-
 }
+*/
 
-
-
-
+void gfluid_emergency_init(data_ptr in, long_complex_t a, long_complex_t b, long_complex_t q, long_complex_t c) {
+  long_complex_t 	w, tmp;
+  cmap_ptr		map = in->map;
+  // sets the initial data to dipole in Q, V
+  for (long j = 0; j < in->N; j++) {
+    w = map->u[j];
+    // natural variables dZ and dPhi
+    //printf("w = %19.12Qe\tre = %19.12Qe\tim = %19.12Qe\n", map->u[j], crealq(1.Q/ctanq(0.5Q*(w-a))), cimagq(1.Q/ctanq(0.5Q*(w-a))));
+    tmp = 1.0Q + q*( 1.0Q/ctanq(0.5Q*(w-a)) - 1.0Q/ctanq(0.5Q*(w-b)) );
+    in->Z[j]   = 0.0Q;
+    in->Phi[j] = 0.0Q;
+    // Dyachenko variables (Q,V)
+    in->Q[j] = 1.Q/csqrtq(tmp);
+    in->V[j] = c*(tmp - 1.Q);
+  }
+}
 
 

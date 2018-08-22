@@ -66,11 +66,11 @@ void ffluid_scan_input_file(FILE *fh) {
     } else if (!strcmp(keyword,"number_points")) {
       printf("Found:\t%s\n", keyword);
       DataCurr.N = strtol(str_value, NULL, 10);
-      this_map.N = DataCurr.N;
       counter++;
     } else if (!strcmp(keyword,"transform_kc")) {
       printf("Found:\t%s\n", keyword);
-      this_map.kc = strtoflt128(str_value, NULL);
+      Control.transform_kc = strtoflt128(str_value, NULL);
+      printf("kc = %.32Qe\n", Control.transform_kc);
       counter++;
      }
   }
