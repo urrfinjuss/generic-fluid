@@ -24,21 +24,41 @@ void gfluid_get_natural_variables(data_ptr in) {
 void gfluid_get_surface(data_ptr in) {
   unsigned long 	N = in->N;
   cmap_ptr		map = in->map;
-  long_complex_t	y0 = 0.Q;
+  long_complex_t	y0 = 0.Q, y1 = 0.Q;
 
   memcpy(AuxLocal.X[0], in->Q, N*sizeof(long_complex_t));
   for (long int j = 0; j < N; j++) {
-    AuxLocal.X[0][j] = (1.0Q/cpowq(AuxLocal.X[0][j],2) - 1.Q)/(map->dq[j])/N;
+    AuxLocal.X[0][j] = cimagq(1.0Q/cpowq(in->Q[j],2))/(map->dq[j])/N;
+    AuxLocal.X[1][j] = crealq(1.0Q/cpowq(in->Q[j],2))/(map->dq[j])/N;
+    AuxLocal.X[2][j] =       (1.0Q/cpowq(in->Q[j],2) - 1.Q)/(map->dq[j])/N;
   }
   fftwq_execute(FFTLocal.fp[0]);
-  AuxLocal.Y[0][0] = 0.0Q;
+  fftwq_execute(FFTLocal.fp[1]);
+  fftwq_execute(FFTLocal.fp[2]);
   for (long int j = 1; j < N/2; j++) {
-    AuxLocal.Y[0][j]   = -1.0IQ*AuxLocal.Y[0][j]/j;
-    AuxLocal.Y[0][N-j] =  1.0IQ*AuxLocal.Y[0][N-j]/j;
+    /* get antiderivative of Zq*/
+    AuxLocal.Y[2][j]   = -1.0IQ*AuxLocal.Y[2][j]/j;
+    AuxLocal.Y[2][N-j] =  1.0IQ*AuxLocal.Y[2][N-j]/j;
   }
   AuxLocal.Y[0][N/2] = 0.Q;
-  fftwq_execute(FFTLocal.bp[0]);
-  memcpy(in->Z, AuxLocal.X[0], N*sizeof(long_complex_t));
+  for (long int j = N/2-1; j > 0; j--) {
+    y0 += -1.0IQ*AuxLocal.Y[0][  j]*conjq(AuxLocal.Y[1][  j])/j;
+    y0 +=  1.0IQ*AuxLocal.Y[0][N-j]*conjq(AuxLocal.Y[1][N-j])/j;
+  }
+
+  AuxLocal.Y[2][0] = -1.0IQ*crealq(y0);
+  fftwq_execute(FFTLocal.bp[2]);
+  memcpy(in->Z, AuxLocal.X[2], N*sizeof(long_complex_t));
+  /* Mean level computation debugging */
+  /* */
+  long_double_t		ml = 0.Q;
+  printf("Zero mode y0 is %39.32Qe\t%39.32Qe\n", crealq(y0), cimagq(y0));
+  for (long int j = 0; j < N; j++) {
+    ml += cimagq(in->Z[j])*crealq(1.0Q/cpowq(in->Q[j], 2))/(map->dq[j]);
+  }
+  ml = 2.Q*PIq*ml/N;
+  printf("Mean Level at %39.32Qe\n", ml);
+  /* */
 }
 
 /*
