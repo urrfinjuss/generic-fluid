@@ -9,7 +9,6 @@ void ffluid_set_initial_data(data_ptr in) {
 
 void ffluid_read_initial_data(data_ptr in) {
   FILE *fh = fopen(Control.res_name,"r");
-  char line[512];
   
   if (fh) {
     ffluid_read_mapping_parameters(in, fh);

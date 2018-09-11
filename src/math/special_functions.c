@@ -1,6 +1,37 @@
 #include "gfluid.h"
 
 
+void elliptic_kc(__float128 *out, __float128 *inkc) {
+/*  Evaluate the complete elliptic integral of the 
+ *  first kind by evaluating its series expansion 
+ *  at k = 0 (kc = 1). 
+ *							*/
+  __float128	t, c[14];
+
+  /* series expansion near k = 0  */
+  t  = powq(*inkc, 2);
+  c[0] = 1.Q;
+  c[1] = -0.25Q;
+  c[2] = 9.Q/64.Q;
+  c[3] = -25.Q/256.Q;
+  c[4] = 1225.Q/16384.Q;
+  c[5] = -3969.Q/65536.Q;
+  c[6] = 53361.Q/1048576.Q;
+  c[7] = -184041.Q/4194304.Q;
+  c[8] = 41409225.Q/1073741824.Q;
+  c[9] = -147744025.Q/4294967296.Q;
+  c[10] = 2133423721.Q/68719476736.Q;
+  c[11] = -7775536041.Q/274877906944.Q;
+  c[12] = 457028729521.Q/17592186044416.Q;
+  c[13] = -1690195005625.Q/70368744177664.Q;
+  *out = c[13];
+  for (int j = 12; j > -1; j-- ) {
+    //*out = -(*out)*t + c[j];
+    *out = fmaq(*out, -t, c[j]);
+  }
+  *out = (*out)*M_PI_2q;
+}
+
 void elliptic_k(__float128 *out, __float128 *inkc) {
 /*  Evaluate the complete elliptic integral of the 
  *  first kind by evaluating its series expansion 
@@ -118,6 +149,7 @@ void jacobi_am(__float128 *out, __float128 *in, __float128 *inkc) {
   __float128 sh7, ch7;
 
   x = *in;
+  /* quad precision trigonometry */
   se1 = 1.Q/coshq(x);
   sh1 = sinhq(x);
   ch1 = coshq(x);
@@ -133,10 +165,10 @@ void jacobi_am(__float128 *out, __float128 *in, __float128 *inkc) {
   /* series expansion near k = 1  */
   t = powq(*inkc, 2);
   /* O(1) */
-  c[0] = -0.5Q*PIq + 2.Q*atanq(expq(x));
+  c[0] = -0.5Q*PIq + 2.Q*atanq(expq(x)); 	// quad prec
   /* O(xc^2) */
-  c[1] = -x*se1 + sh1;
-  c[1] = -0.25Q*c[1];
+  c[1] = -x*se1 + sh1;				// quad prec
+  c[1] = -0.25Q*c[1];				// quad prec
   /* O(xc^4) */
   c[2] = -4.Q*x*ch1 + 9.Q*sh1 - x*se1*(5.Q + 2.Q*x*th1);
   c[2] = c[2]/64.Q;
@@ -193,7 +225,7 @@ void jacobi_am(__float128 *out, __float128 *in, __float128 *inkc) {
   /* sum the terms starting with the smallest by Horner's method */
   *out = c[8];
   for (int j = 7; j > -1; j-- ) {
-    //*out = -(*out)*t + c[j];
+    // *out = -(*out)*t + c[j];
     *out = fmaq(*out, -t, c[j]);
   }
 }
@@ -222,7 +254,7 @@ void jacobi_am(__float128 *out, __float128 *in, __float128 *inkc) {
 
 void jacobi_sn(__float128 *out, __float128 *in, __float128 *inkc) {
   __float128 c[7];
-  __float128 t, tmp;
+  __float128 t;
   __float128 sec1, tan1;
   __float128 sin2, cos2;
   __float128 sin4, cos4;

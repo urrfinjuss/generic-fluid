@@ -1,3 +1,5 @@
+#define MPFR_WANT_FLOAT128
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,9 +7,13 @@
 #include <quadmath.h>
 #include <complex.h>
 #include <fftw3.h>
+#include <mpfr.h>
+#include <mpc.h>
 
-#define PIq 	acosq(-1.0Q)
+//#define PIq 	acosq(-1.0Q)
+#define PIq	M_PIq
 #define PIl	acosl(-1.0L)
+#define MPFR_PREC	512
 
 typedef __float128		long_double_t;
 typedef fftwq_complex		long_complex_t;
@@ -61,7 +67,7 @@ typedef struct fft_array {
 /* Note to self: remember top to bottom this time */
 #include "headers/special_functions.h"
 #include "headers/math.h"
-
+#include "headers/timemarching.h"
 
 #include "headers/debug.h"
 //#include "headers/array_func.h"
@@ -74,8 +80,9 @@ typedef struct fft_array {
 typedef struct control_parameters_array{
   data_ptr		DataPtrCurr, DataPtrPrev;
   evolve_params_ptr 	EvolvePtr;
-  long_double_t		Sigma;
-  long_double_t		transform_kc;
+  __float128		Sigma;
+  __float128		Gravity;
+  __float128		transform_kc;
   char 			run_name[80];
   char			res_name[80];
   char			data_path[80];

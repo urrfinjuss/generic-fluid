@@ -1,7 +1,7 @@
 #include "gfluid.h"
 
 /* Set number of parameters to be set in the input file */
-#define INPUT_FILE_ARGS 8	
+#define INPUT_FILE_ARGS 9	
 
 void ffluid_read_cl_arguments(int narg, char **argv) {
   if (narg != 2) {
@@ -59,6 +59,10 @@ void ffluid_scan_input_file(FILE *fh) {
       printf("Found:\t%s\n", keyword);
       Control.Sigma = strtoflt128(str_value, NULL);
       counter++;
+    } else if (!strcmp(keyword,"grv_coeff")) {
+      printf("Found:\t%s\n", keyword);
+      Control.Gravity = strtoflt128(str_value, NULL);
+      counter++;
     } else if (!strcmp(keyword,"fin_time")) {
       printf("Found:\t%s\n", keyword);
       EvolveConfig.final_time = strtoflt128(str_value, NULL);
@@ -70,7 +74,7 @@ void ffluid_scan_input_file(FILE *fh) {
     } else if (!strcmp(keyword,"transform_kc")) {
       printf("Found:\t%s\n", keyword);
       Control.transform_kc = strtoflt128(str_value, NULL);
-      printf("kc = %.32Qe\n", Control.transform_kc);
+      //printf("kc = %.32Qe\n", Control.transform_kc);
       counter++;
      }
   }

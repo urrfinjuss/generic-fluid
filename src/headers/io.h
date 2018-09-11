@@ -20,5 +20,3 @@ extern void ffluid_write_spectrum(data_ptr in, char *fname);
 extern void ffluid_start_log(char *fname);
 extern void ffluid_append_to_log(data_ptr in, char *fname);
 
-
-
